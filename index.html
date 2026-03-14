@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Ticord</title>
+
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"></script>
+
+  <script src="./assets/0c7d02df18658200.js" async></script>
+  <script src="./assets/0f1e42ae594a3b5d.js" async></script>
+  <script src="./assets/0f5a920733283a3e.js" async></script>
+  <script src="./assets/0f06ace228180330.js" async></script>
+  <script src="./assets/3ba0678ab9c6fe10.js" async></script>
+  <script src="./assets/4ff5a3ada150a485.js" async></script>
+  <script src="./assets/5bf498f660f61380.js" async></script>
+  <script src="./assets/6a9a38d71fa12905.js" async></script>
+  <script src="./assets/6f9cdab83f19830e.js" async></script>
+  <script src="./assets/7ec60f3c14a5e7db.js" async></script>
+  <script src="./assets/37fa54d2de393c81.js" async></script>
+  <script src="./assets/81ed7b0e233cfbe7.js" async></script>
+  <script src="./assets/88cb56760100c483.js" async></script>
+  <script src="./assets/95b7ebf9f8641138.js" async></script>
+  <script src="./assets/511e3cb6eb4fef8c.js" async></script>
+  <script src="./assets/575c595ed87bae1a.js" async></script>
+  <script src="./assets/583e7d2eeef07e8b.js" async></script>
+  <script src="./assets/2094d72b5bac8530.js" async></script>
+  <script src="./assets/93346f188d69eb83.js" async></script>
+  <script src="./assets/1448779aa7adc751.js" async></script>
+  <script src="./assets/b5a0ac0b934905b1.js" async></script>
+  <script src="./assets/ce12540be593d439.js" async></script>
+  <script src="./assets/d017bd86c9c06760.js" async></script>
+  <script src="./assets/dd9e970cc4a1fcbd.js" async></script>
+  <script src="./assets/f8e7c687d8b4cc91.js" async></script>
+  <script src="./assets/f14a5e5757b219fc.js" async></script>
+  <script src="./assets/f57fa5c0d137ed46.js" async></script>
+  <script src="./assets/fast-connect.3ba0678ab9c6fe10.js" async></script>
+  <script src="./assets/fast-connect.3ba0678ab9c6fe10(1).js" async></script>
+  <script src="./assets/fe5b1e2576e54fb9.js" async></script>
+  <script src="./assets/feb7f2daa7493f90.js" async></script>
+  <script src="./assets/libdiscore-wasm-fetch.b5a0ac0b934905b1.js" async></script>
+  <script src="./assets/sentry.0c7d02df18658200(1).js" async></script>
+  <script src="./assets/sentry.0c7d02df18658200.js" async></script>
+  <script src="./assets/web.1448779aa7adc751(1).js" async></script>
+  <script src="./assets/web.1448779aa7adc751.js" async></script>
+
+  <style>
+    body { margin:0; height:100vh; background:#36393f; color:#dcddde; font-family:system-ui,sans-serif; display:flex; overflow:hidden; }
+    
+    #loading { position:fixed; inset:0; background:#36393f; z-index:9999; display:flex; flex-direction:column; align-items:center; justify-content:center; }
+    .spinner { width:50px; height:50px; border:5px solid #7289da44; border-top:5px solid #7289da; border-radius:50%; animation:spin 1s linear infinite; }
+    @keyframes spin { to { transform:rotate(360deg); } }
+
+    /* LOGS NO TOPO DIREITO - Pensado para Mobile */
+    #log-panel { 
+        position:fixed; top:60px; right:10px; width:260px; max-width:80vw; 
+        max-height:100px; background:rgba(0,0,0,0.7); color:#43b581; 
+        font-family:monospace; font-size:10px; padding:8px; border-radius:6px; 
+        overflow-y:auto; z-index:9998; pointer-events:none; border: 1px solid rgba(255,255,255,0.1);
+    }
+
+    #servers { width:72px; background:#202225; padding:12px 0; display:flex; flex-direction:column; align-items:center; gap:8px; overflow-y:auto; }
+    .server { width:48px; height:48px; background:#5865f2; border-radius:50%; cursor:pointer; display:flex; align-items:center; justify-content:center; font-weight:bold; transition: 0.2s; }
+    .server:hover { border-radius: 30%; background: #4752c4; }
+
+    #sidebar { width:240px; background:#2f3136; padding:12px; }
+    #main { flex:1; display:flex; flex-direction:column; position: relative; }
+    
+    #header { height:48px; background:#36393f; padding:0 16px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid #202225; }
+    .header-actions { display: flex; gap: 8px; align-items: center; }
+    
+    #messages { flex:1; padding:16px; overflow-y:auto; display:flex; flex-direction:column; }
+    .message { margin-bottom:12px; display:flex; gap:10px; }
+    .message.you { flex-direction:row-reverse; }
+    .avatar { width:36px; height:36px; border-radius:50%; background:#5865f2; background-size:cover; background-position: center; flex-shrink:0; }
+    .text { background:#40444b; padding:8px 12px; border-radius:8px; max-width: 75%; overflow-wrap: break-word; }
+    .you .text { background:#5865f2; color:white; }
+
+    #input-area { padding:12px; background:#2f3136; display:flex; gap:8px; }
+    #chat-input { flex:1; padding:10px; background:#40444b; border:none; border-radius:8px; color:white; outline: none; }
+
+    /* MODAL */
+    #profile-modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.8); display:none; align-items:center; justify-content:center; z-index:10000; }
+    #profile-modal { background:#36393f; width:90%; max-width:400px; padding:20px; border-radius:8px; border: 1px solid #444; }
+    .modal-field label { display: block; font-size: 11px; text-transform: uppercase; color: #b9bbbe; font-weight: bold; margin-bottom: 5px; }
+    .modal-field input { width:100%; padding:10px; margin-bottom:15px; background:#202225; border:none; color:white; border-radius:4px; box-sizing:border-box; }
+    
+    .btn { border:none; border-radius:4px; padding:6px 12px; cursor:pointer; font-weight: 500; color: white; }
+    #profile-btn { background:#4f545c; }
+    #leave-btn { background:#f04747; display: none; } /* Só aparece quando em um server */
+    .btn-save { background:#5865f2; padding: 10px 20px; }
+
+    @media (max-width: 600px) {
+        #sidebar { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <div id="loading">
+    <div class="spinner"></div>
+    <div style="margin-top:15px; font-size:14px; color:#7289da;">Carregando Scripts...</div>
+  </div>
+  
+  <div id="log-panel"></div>
+
+  <div id="ui" style="display:none; width:100%; height:100%;">
+    <div id="servers">
+        <div class="server" onclick="createServer()" title="Create Server">+</div>
+    </div>
+    
+    <div id="sidebar">
+      <div style="color:#7289da; font-weight:bold; margin-bottom:15px; font-size:12px; text-transform:uppercase;">Servidores</div>
+      <input id="join-code-input" placeholder="Invite Code..." style="width:100%; padding:8px; background:#40444b; border:none; color:white; border-radius:4px; margin-bottom:8px; box-sizing: border-box;">
+      <button id="join-btn" style="width:100%; background:#43b581; border:none; color:white; padding:8px; border-radius:4px; cursor:pointer;">Join Server</button>
+    </div>
+
+    <div id="main">
+      <div id="header">
+        <span id="server-name" style="font-weight: bold;">Ticord</span>
+        <div class="header-actions">
+            <button id="leave-btn" class="btn" onclick="leaveServer()">Leave</button>
+            <button id="profile-btn" class="btn">Profile</button>
+        </div>
+      </div>
+      <div id="messages">
+          <div style="margin: auto; color: #7289da; text-align: center;">Welcome to Ticord!<br>Join a server to start chatting.</div>
+      </div>
+      <div id="input-area">
+        <input id="chat-input" placeholder="Message..." disabled />
+      </div>
+    </div>
+  </div>
+
+  <div id="profile-modal-overlay">
+    <div id="profile-modal">
+      <h3 style="margin:0 0 20px 0; color: white;">User Settings</h3>
+      <div class="modal-field"><label>Username</label><input type="text" id="modal-username"></div>
+      <div class="modal-field"><label>Avatar URL</label><input type="text" id="modal-avatar" placeholder="https://..."></div>
+      <div style="display:flex; justify-content: flex-end; gap: 10px;">
+        <button onclick="closeProfile()" style="background:none; border:none; color:white; cursor:pointer;">Cancel</button>
+        <button onclick="saveProfile()" class="btn btn-save">Save Changes</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Firebase Config (Original)
+    const firebaseConfig = {
+      apiKey: "AIzaSyCXbYHebvpVacqtewv6rgK_BW1QRzxeGa0",
+      authDomain: "ticord-b3840.firebaseapp.com",
+      projectId: "ticord-b3840",
+      storageBucket: "ticord-b3840.firebasestorage.app",
+      messagingSenderId: "555263749675",
+      appId: "1:555263749675:web:2112209a26aecc9f05046e"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    function log(msg) {
+        const p = document.createElement('div');
+        p.textContent = `> ${msg}`;
+        const panel = document.getElementById('log-panel');
+        panel.appendChild(p);
+        panel.scrollTop = panel.scrollHeight;
+    }
+
+    // Inicialização
+    setTimeout(() => {
+        document.getElementById('loading').style.display='none';
+        document.getElementById('ui').style.display='flex';
+        log('Scripts Loaded');
+        log('Ticord Engine Ready');
+    }, 2500);
+
+    let currentUser = { 
+        name: localStorage.getItem('username') || 'User' + Math.floor(Math.random()*1000), 
+        avatar: localStorage.getItem('avatar') || '' 
+    };
+    let currentServerId = null;
+
+    // Profile Settings
+    const modal = document.getElementById('profile-modal-overlay');
+    document.getElementById('profile-btn').onclick = () => {
+        document.getElementById('modal-username').value = currentUser.name;
+        document.getElementById('modal-avatar').value = currentUser.avatar;
+        modal.style.display = 'flex';
+    };
+    function closeProfile() { modal.style.display = 'none'; }
+    function saveProfile() {
+        currentUser.name = document.getElementById('modal-username').value || currentUser.name;
+        currentUser.avatar = document.getElementById('modal-avatar').value;
+        localStorage.setItem('username', currentUser.name);
+        localStorage.setItem('avatar', currentUser.avatar);
+        log('Profile cached');
+        closeProfile();
+    }
+
+    // Server Logic
+    function createServer() {
+        const n = prompt("Server Name:");
+        if(!n) return;
+        const c = Math.random().toString(36).substring(7).toUpperCase();
+        db.ref(`ticord/servers/${c}`).set({name: n, owner: currentUser.name})
+        .then(() => {
+            alert("Server Created! Code: " + c);
+            joinServer(c);
+        });
+    }
+
+    document.getElementById('join-btn').onclick = () => {
+        const code = document.getElementById('join-code-input').value.trim().toUpperCase();
+        if(code) joinServer(code);
+    };
+
+    function joinServer(code) {
+        db.ref(`ticord/servers/${code}`).once('value', s => {
+            if(s.exists()){
+                currentServerId = code;
+                document.getElementById('server-name').textContent = s.val().name;
+                document.getElementById('chat-input').disabled = false;
+                document.getElementById('leave-btn').style.display = 'block';
+                startChat(code);
+                log(`Connected to: ${code}`);
+            } else { alert("Invalid Server Code"); }
+        });
+    }
+
+    function leaveServer() {
+        if(!currentServerId) return;
+        db.ref(`ticord/servers/${currentServerId}/messages`).off();
+        currentServerId = null;
+        document.getElementById('messages').innerHTML = '<div style="margin: auto; color: #7289da; text-align: center;">You left the server.</div>';
+        document.getElementById('server-name').textContent = 'Ticord';
+        document.getElementById('chat-input').disabled = true;
+        document.getElementById('leave-btn').style.display = 'none';
+        log('Disconnected');
+    }
+
+    function startChat(id) {
+        const msgDiv = document.getElementById('messages');
+        msgDiv.innerHTML = '';
+        db.ref(`ticord/servers/${id}/messages`).off(); 
+        db.ref(`ticord/servers/${id}/messages`).on('child_added', snap => {
+            const m = snap.val();
+            const d = document.createElement('div');
+            d.className = 'message' + (m.author === currentUser.name ? ' you' : '');
+            d.innerHTML = `
+                <div class="avatar" style="background-image:url(${m.avatar || ''})"></div>
+                <div class="text">
+                    <span style="font-size: 11px; opacity: 0.7;">${m.author}</span><br>
+                    ${m.text}
+                </div>`;
+            msgDiv.appendChild(d);
+            msgDiv.scrollTop = msgDiv.scrollHeight;
+        });
+    }
+
+    document.getElementById('chat-input').onkeypress = e => {
+        if(e.key === 'Enter' && e.target.value.trim()){
+            db.ref(`ticord/servers/${currentServerId}/messages`).push({
+                author: currentUser.name,
+                avatar: currentUser.avatar,
+                text: e.target.value,
+                time: Date.now()
+            });
+            e.target.value = '';
+        }
+    };
+  </script>
+</body>
+</html>
